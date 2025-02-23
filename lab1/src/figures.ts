@@ -4,7 +4,79 @@ import { chunk } from 'es-toolkit'
 import { GLAttributes } from './gl.ts'
 import { matMult } from './utils.ts'
 
-export class Cube {
+export class Figure {
+  initialPoints: number[] = []
+  indices: number[] = []
+
+  position = vec3.fromValues(0, 0, 0)
+  transformMat = mat4.create()
+  size = 0.5
+
+  colors: number[] = []
+
+  constructor(props: { position?: vec3; size?: number }) {
+    this.position = props.position ?? this.position
+    this.size = props.size ?? this.size
+  }
+
+  get points() {
+    const pos = vec3.clone(this.position)
+    vec3.transformMat4(pos, pos, this.transformMat)
+    return chunk(this.initialPoints, 3).flatMap((p) => {
+      const v = p as vec3
+      vec3.transformMat4(v, v, matMult(this.baseTransform, this.transformMat))
+      return v as number[]
+    })
+  }
+
+  get baseTransform() {
+    const mat = mat4.create()
+    mat4.scale(mat, mat, times(3, () => this.size) as vec3)
+    mat4.translate(mat, mat, this.position)
+    return mat
+  }
+
+  transform(mat: mat4) {
+    this.transformMat = mat
+  }
+
+  render(gl: WebGLRenderingContext) {
+    const vertBuffer = gl.createBuffer()
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertBuffer)
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array(this.points),
+      gl.STATIC_DRAW,
+    )
+
+    const colorBuffer = gl.createBuffer()
+    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer)
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array(this.colors),
+      gl.STATIC_DRAW,
+    )
+
+    const indicesBuffer = gl.createBuffer()
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer)
+    gl.bufferData(
+      gl.ELEMENT_ARRAY_BUFFER,
+      new Uint16Array(this.indices),
+      gl.STATIC_DRAW,
+    )
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertBuffer)
+    gl.vertexAttribPointer(GLAttributes.vPosition, 3, gl.FLOAT, false, 0, 0)
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer)
+    gl.vertexAttribPointer(GLAttributes.vVertexColor, 4, gl.FLOAT, false, 0, 0)
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer)
+    gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0)
+  }
+}
+
+export class Cube extends Figure {
   initialPoints = [
     // Front face
     -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0,
@@ -39,83 +111,16 @@ export class Cube {
 
   position = vec3.fromValues(0, 0, 0)
   transformMat = mat4.create()
-  size = 0.5
 
   constructor(props: { position?: vec3; size?: number; colors?: vec4[] }) {
-    this.position = props.position ?? this.position
-    this.size = props.size ?? this.size
+    super(props)
     this.colors = (
       props.colors ?? times(6, () => [1.0, 1.0, 1.0, 1.0])
     ).flatMap((c) => [c, c, c, c].flat() as number[])
   }
-
-  get points() {
-    const pos = vec3.clone(this.position)
-    vec3.transformMat4(pos, pos, this.transformMat)
-    return chunk(this.initialPoints, 3).flatMap((p) => {
-      const v = p as vec3
-      vec3.transformMat4(v, v, matMult(this.baseTransform, this.transformMat))
-      return v as number[]
-    })
-  }
-
-  get baseTransform() {
-    const mat = mat4.create()
-    mat4.scale(mat, mat, times(3, () => this.size) as vec3)
-    mat4.translate(mat, mat, this.position)
-    return mat
-  }
-
-  transform(mat: mat4) {
-    this.transformMat = mat
-    // console.log(mat)
-    // this.transformMat = mat
-    // this.points = chunk(this.points, 3).flatMap((p) => {
-    //   const v = p as vec3
-    //   vec3.transformMat4(v, v, mat)
-    //   return v as number[]
-    // })
-    // console.log(this.points)
-  }
-
-  render(gl: WebGLRenderingContext) {
-    const vertBuffer = gl.createBuffer()
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertBuffer)
-    gl.bufferData(
-      gl.ARRAY_BUFFER,
-      new Float32Array(this.points),
-      gl.STATIC_DRAW,
-    )
-
-    const colorBuffer = gl.createBuffer()
-    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer)
-    gl.bufferData(
-      gl.ARRAY_BUFFER,
-      new Float32Array(this.colors),
-      gl.STATIC_DRAW,
-    )
-
-    const indicesBuffer = gl.createBuffer()
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer)
-    // Теперь отправим массив элементов в GL
-    gl.bufferData(
-      gl.ELEMENT_ARRAY_BUFFER,
-      new Uint16Array(this.indices),
-      gl.STATIC_DRAW,
-    )
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertBuffer)
-    gl.vertexAttribPointer(GLAttributes.vPosition, 3, gl.FLOAT, false, 0, 0)
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer)
-    gl.vertexAttribPointer(GLAttributes.vVertexColor, 4, gl.FLOAT, false, 0, 0)
-
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer)
-    gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0)
-  }
 }
 
-export class Tetrahedron {
+export class Tetrahedron extends Figure {
   initialPoints = [
     // Вершина 1
     1, 1, 1,
@@ -142,70 +147,11 @@ export class Tetrahedron {
 
   position = vec3.fromValues(0, 0, 0)
   transformMat = mat4.create()
-  size = 0.5
 
   constructor(props: { position?: vec3; size?: number; colors?: vec4[] }) {
-    this.position = props.position ?? this.position
-    this.size = props.size ?? this.size
+    super(props)
     this.colors = (
       props.colors ?? times(4, () => [1.0, 1.0, 1.0, 1.0])
     ).flatMap((c) => [c].flat() as number[])
-  }
-
-  get points() {
-    const pos = vec3.clone(this.position)
-    vec3.transformMat4(pos, pos, this.transformMat)
-    return chunk(this.initialPoints, 3).flatMap((p) => {
-      const v = p as vec3
-      vec3.transformMat4(v, v, matMult(this.baseTransform, this.transformMat))
-      return v as number[]
-    })
-  }
-
-  get baseTransform() {
-    const mat = mat4.create()
-    mat4.scale(mat, mat, times(3, () => this.size) as vec3)
-    mat4.translate(mat, mat, this.position)
-    return mat
-  }
-
-  transform(mat: mat4) {
-    this.transformMat = mat
-  }
-
-  render(gl: WebGLRenderingContext) {
-    const vertBuffer = gl.createBuffer()
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertBuffer)
-    gl.bufferData(
-      gl.ARRAY_BUFFER,
-      new Float32Array(this.points),
-      gl.STATIC_DRAW,
-    )
-
-    const colorBuffer = gl.createBuffer()
-    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer)
-    gl.bufferData(
-      gl.ARRAY_BUFFER,
-      new Float32Array(this.colors),
-      gl.STATIC_DRAW,
-    )
-
-    const indicesBuffer = gl.createBuffer()
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer)
-    // Теперь отправим массив элементов в GL
-    gl.bufferData(
-      gl.ELEMENT_ARRAY_BUFFER,
-      new Uint16Array(this.indices),
-      gl.STATIC_DRAW,
-    )
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertBuffer)
-    gl.vertexAttribPointer(GLAttributes.vPosition, 3, gl.FLOAT, false, 0, 0)
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer)
-    gl.vertexAttribPointer(GLAttributes.vVertexColor, 4, gl.FLOAT, false, 0, 0)
-
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer)
-    gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0)
   }
 }
