@@ -32,14 +32,15 @@ async function init() {
   }
 
   gl = useWebGL(canvas.value)!
-
   if (!canvas.value) {
     error.value = 'Не удалось загрузить WebGL 😥'
   }
 
   gl.viewport(0, 0, canvas.value.width, canvas.value.height)
-
   await loadShaders(gl)
+
+  state.xrot = 70
+  state.yrot = 30
 
   requestAnimationFrame(render)
 }
