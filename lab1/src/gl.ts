@@ -12,7 +12,7 @@ export async function loadShaders(gl: WebGLRenderingContext) {
 
   for (const fileName in shaderFiles) {
     // Загрузка файла
-    const shaderFile = await import(/* @vite-ignore */ `${fileName}?raw`)
+    const shaderFile = (await shaderFiles[fileName]()) as any
     // Извлечение кода шейдера
     const shaderSrc = shaderFile.default
     let shader: WebGLShader | null = null
