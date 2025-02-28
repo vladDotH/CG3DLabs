@@ -1,6 +1,6 @@
 export const GLAttributes = {
-  vPosition: 0,
-  vVertexColor: 0,
+  aPosition: 0,
+  aVertexColor: 0,
 }
 
 // Загрузка шейдеров в папке shaders

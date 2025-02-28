@@ -66,10 +66,10 @@ export class Figure {
     )
 
     gl.bindBuffer(gl.ARRAY_BUFFER, vertBuffer)
-    gl.vertexAttribPointer(GLAttributes.vPosition, 3, gl.FLOAT, false, 0, 0)
+    gl.vertexAttribPointer(GLAttributes.aPosition, 3, gl.FLOAT, false, 0, 0)
 
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer)
-    gl.vertexAttribPointer(GLAttributes.vVertexColor, 4, gl.FLOAT, false, 0, 0)
+    gl.vertexAttribPointer(GLAttributes.aVertexColor, 4, gl.FLOAT, false, 0, 0)
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer)
     gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0)
@@ -107,10 +107,10 @@ export class Figure {
     )
 
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
-    gl.vertexAttribPointer(GLAttributes.vPosition, 3, gl.FLOAT, false, 0, 0)
+    gl.vertexAttribPointer(GLAttributes.aPosition, 3, gl.FLOAT, false, 0, 0)
 
     gl.bindBuffer(gl.ARRAY_BUFFER, colorsBuffer)
-    gl.vertexAttribPointer(GLAttributes.vVertexColor, 4, gl.FLOAT, false, 0, 0)
+    gl.vertexAttribPointer(GLAttributes.aVertexColor, 4, gl.FLOAT, false, 0, 0)
 
     gl.lineWidth(4)
     gl.drawArrays(gl.LINES, 0, arrowsPoints.length)
