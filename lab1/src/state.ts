@@ -1,13 +1,19 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { reactive } from 'vue'
 
 export const useState = defineStore('state', () => {
-  const xrot = ref(0),
-    yrot = ref(0),
-    zrot = ref(0),
-    x = ref(0),
-    y = ref(0),
-    z = ref(0)
+  const params = () => ({
+    xrot: 0,
+    yrot: 0,
+    zrot: 0,
+    x: 0,
+    y: 0,
+    z: 0,
+    arrows: false,
+  })
 
-  return { xrot, yrot, zrot, z, x, y }
+  const cube = reactive(params()),
+    tetrahedron = reactive(params())
+
+  return { cube, tetrahedron }
 })

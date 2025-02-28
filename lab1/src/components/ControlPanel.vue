@@ -3,72 +3,64 @@
     <div class="item">
       <label style="font-size: 20px">Cube</label>
       <hr />
-      <div>
-        <input
-          id="x-slider"
-          v-model="state.x"
-          type="range"
-          name="x-slider"
-          min="-100"
-          max="100"
-        />
-        <label for="x-slider">X: {{ state.x }}</label>
-      </div>
-      <div>
-        <input
-          id="y-slider"
-          v-model="state.y"
-          type="range"
-          name="y-slider"
-          min="-100"
-          max="100"
-        />
-        <label for="y-slider">Y: {{ state.y }}</label>
-      </div>
-      <div>
-        <input
-          id="z-slider"
-          v-model="state.z"
-          type="range"
-          name="z-slider"
-          min="-100"
-          max="100"
-        />
-        <label for="z-slider">Z: {{ state.z }}</label>
+
+      <div v-for="prop in ['x', 'y', 'z'] as const" :key="prop">
+        <label>
+          <input v-model="state.cube[prop]" type="range" min="-100" max="100" />
+          {{ prop.toUpperCase() }}: {{ state.cube[prop] }}
+        </label>
       </div>
       <br />
-      <div>
-        <input
-          id="xrot-slider"
-          v-model="state.xrot"
-          type="range"
-          name="xrot-slider"
-          min="0"
-          max="360"
-        />
-        <label for="xrot-slider">x-rot: {{ state.xrot }}</label>
+      <div v-for="prop in ['xrot', 'yrot', 'zrot'] as const" :key="prop">
+        <label>
+          <input v-model="state.cube[prop]" type="range" min="-100" max="100" />
+          {{ prop }}: {{ state.cube[prop] }}
+        </label>
       </div>
+
       <div>
-        <input
-          id="yrot-slider"
-          v-model="state.yrot"
-          type="range"
-          name="yrot-slider"
-          min="0"
-          max="360"
-        />
-        <label for="yrot-slider">y-rot: {{ state.yrot }}</label>
+        <label>
+          Показать направление
+          <input v-model="state.cube.arrows" type="checkbox" />
+        </label>
       </div>
+    </div>
+
+    <div class="item">
+      <label style="font-size: 20px">Tetrahedron</label>
+      <hr />
+
+      <div v-for="prop in ['x', 'y', 'z'] as const" :key="prop">
+        <label>
+          <input
+            v-model="state.tetrahedron[prop]"
+            type="range"
+            min="-100"
+            max="100"
+          />
+          {{ prop.toUpperCase() }}: {{ state.tetrahedron[prop] }}
+        </label>
+      </div>
+      <br />
+      <div v-for="prop in ['xrot', 'yrot', 'zrot'] as const" :key="prop">
+        <label>
+          <input
+            v-model="state.tetrahedron[prop]"
+            type="range"
+            min="-100"
+            max="100"
+          />
+          {{ prop }}: {{ state.tetrahedron[prop] }}
+        </label>
+      </div>
+
+      <br />
+
       <div>
-        <input
-          id="zrot-slider"
-          v-model="state.zrot"
-          type="range"
-          name="zrot-slider"
-          min="0"
-          max="360"
-        />
-        <label for="zrot-slider">z-rot: {{ state.zrot }}</label>
+        <label>
+          Показать направление
+          <input v-model="state.tetrahedron.arrows" type="checkbox" />
+        </label>
       </div>
     </div>
   </div>

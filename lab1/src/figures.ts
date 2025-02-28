@@ -73,6 +73,47 @@ export class Figure {
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer)
     gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0)
+
+    if (this.showArrows) {
+      this.renderOrientationArrows(gl)
+    }
+  }
+
+  showArrows = false
+  arrowPoints: number[] = []
+  arrowColors: number[] = []
+
+  renderOrientationArrows(gl: WebGLRenderingContext) {
+    const arrowsPoints = chunk(this.arrowPoints, 3).flatMap((p) => {
+      const v = p as vec3
+      vec3.transformMat4(v, v, matMult(this.baseTransform, this.transformMat))
+      return v as number[]
+    })
+
+    const positionBuffer = gl.createBuffer()
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array(arrowsPoints),
+      gl.STATIC_DRAW,
+    )
+
+    const colorsBuffer = gl.createBuffer()
+    gl.bindBuffer(gl.ARRAY_BUFFER, colorsBuffer)
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array(this.arrowColors),
+      gl.STATIC_DRAW,
+    )
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
+    gl.vertexAttribPointer(GLAttributes.vPosition, 3, gl.FLOAT, false, 0, 0)
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, colorsBuffer)
+    gl.vertexAttribPointer(GLAttributes.vVertexColor, 4, gl.FLOAT, false, 0, 0)
+
+    gl.lineWidth(4)
+    gl.drawArrays(gl.LINES, 0, arrowsPoints.length)
   }
 }
 
@@ -118,6 +159,24 @@ export class Cube extends Figure {
       props.colors ?? times(6, () => [1.0, 1.0, 1.0, 1.0])
     ).flatMap((c) => [c, c, c, c].flat() as number[])
   }
+
+  arrowPoints = [
+    0, 0, 0, 0, 2, 0,
+
+    0.2, 1.8, 0, 0, 2, 0, -0.2, 1.8, -0, 0, 2, 0,
+
+    0, 0, 0, 2, 0, 0,
+
+    1.8, 0.2, 0, 2, 0, 0, 1.8, -0.2, 0, 2, 0, 0,
+
+    0, 0, 0, 0, 0, 2,
+
+    0.2, 0, 1.8, 0, 0, 2, -0.2, 0, 1.8, 0, 0, 2,
+  ]
+
+  arrowColors = times(this.arrowPoints.length / 3, () => [
+    0.7, 0.7, 0.7, 1,
+  ]).flat()
 }
 
 export class Tetrahedron extends Figure {
@@ -154,4 +213,18 @@ export class Tetrahedron extends Figure {
       props.colors ?? times(4, () => [1.0, 1.0, 1.0, 1.0])
     ).flatMap((c) => [c].flat() as number[])
   }
+
+  arrowPoints = [
+    0, 0, 0, 1.5, 1.5, 1.5,
+
+    0, 0, 0, 1.5, -1.5, -1.5,
+
+    0, 0, 0, -1.5, -1.5, 1.5,
+
+    0, 0, 0, -1.5, 1.5, -1.5,
+  ]
+
+  arrowColors = times(this.arrowPoints.length / 3, () => [
+    0.7, 0.7, 0.7, 1,
+  ]).flat()
 }

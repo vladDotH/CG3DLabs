@@ -39,8 +39,15 @@ async function init() {
   gl.viewport(0, 0, canvas.value.width, canvas.value.height)
   await loadShaders(gl)
 
-  state.xrot = 70
-  state.yrot = 30
+  state.cube.xrot = 70
+  state.cube.yrot = 30
+  state.cube.x = 20
+  state.cube.y = 20
+
+  state.tetrahedron.xrot = 220
+  state.tetrahedron.yrot = 70
+  state.tetrahedron.x = -20
+  state.tetrahedron.z = -20
 
   requestAnimationFrame(render)
 }
@@ -68,29 +75,48 @@ const tetrahedron = new Tetrahedron({
   size: 0.3,
 })
 
-tetrahedron.transform(
-  matMult(
-    mat4.fromTranslation(mat4.create(), vec3.fromValues(0.5, 0.5, 0.5)),
-    rotMat4(0.5, 0.1, 0.1),
-  ),
-)
-
 watch(
-  () => [state.xrot, state.yrot, state.zrot, state.x, state.y, state.z],
+  () => state.cube,
   () => {
     const rot = rotMat4(
-      glMatrix.toRadian(state.xrot),
-      glMatrix.toRadian(state.yrot),
-      glMatrix.toRadian(state.zrot),
+      glMatrix.toRadian(state.cube.xrot),
+      glMatrix.toRadian(state.cube.yrot),
+      glMatrix.toRadian(state.cube.zrot),
     )
 
     const tr = mat4.fromTranslation(
       mat4.create(),
-      vec3.fromValues(state.x / 20, state.y / 20, state.z / 20),
+      vec3.fromValues(state.cube.x / 20, state.cube.y / 20, state.cube.z / 20),
     )
 
+    cube.showArrows = state.cube.arrows
     cube.transform(matMult(rot, tr))
   },
+  { deep: true },
+)
+
+watch(
+  () => state.tetrahedron,
+  () => {
+    const rot = rotMat4(
+      glMatrix.toRadian(state.tetrahedron.xrot),
+      glMatrix.toRadian(state.tetrahedron.yrot),
+      glMatrix.toRadian(state.tetrahedron.zrot),
+    )
+
+    const tr = mat4.fromTranslation(
+      mat4.create(),
+      vec3.fromValues(
+        state.tetrahedron.x / 20,
+        state.tetrahedron.y / 20,
+        state.tetrahedron.z / 20,
+      ),
+    )
+
+    tetrahedron.showArrows = state.tetrahedron.arrows
+    tetrahedron.transform(matMult(rot, tr))
+  },
+  { deep: true },
 )
 
 function render() {
