@@ -41,13 +41,11 @@ async function init() {
 
   state.cube.xrot = 70
   state.cube.yrot = 30
-  state.cube.x = 20
-  state.cube.y = 20
+  state.cube.x = 40
 
   state.tetrahedron.xrot = 220
   state.tetrahedron.yrot = 70
-  state.tetrahedron.x = -20
-  state.tetrahedron.z = -20
+  state.tetrahedron.x = -40
 
   requestAnimationFrame(render)
 }
@@ -75,6 +73,8 @@ const tetrahedron = new Tetrahedron({
   size: 0.3,
 })
 
+const PosScale = 1 / 30
+
 watch(
   () => state.cube,
   () => {
@@ -84,13 +84,11 @@ watch(
       glMatrix.toRadian(state.cube.zrot),
     )
 
-    const tr = mat4.fromTranslation(
-      mat4.create(),
-      vec3.fromValues(state.cube.x / 20, state.cube.y / 20, state.cube.z / 20),
-    )
+    cube.position = vec3.fromValues(state.cube.x, state.cube.y, state.cube.z)
+    vec3.scale(cube.position, cube.position, PosScale)
 
     cube.showArrows = state.cube.arrows
-    cube.transform(matMult(rot, tr))
+    cube.transform(rot)
   },
   { deep: true },
 )
@@ -104,17 +102,16 @@ watch(
       glMatrix.toRadian(state.tetrahedron.zrot),
     )
 
-    const tr = mat4.fromTranslation(
-      mat4.create(),
-      vec3.fromValues(
-        state.tetrahedron.x / 20,
-        state.tetrahedron.y / 20,
-        state.tetrahedron.z / 20,
-      ),
+    tetrahedron.position = vec3.fromValues(
+      state.tetrahedron.x,
+      state.tetrahedron.y,
+      state.tetrahedron.z,
     )
 
+    vec3.scale(tetrahedron.position, tetrahedron.position, PosScale)
+
     tetrahedron.showArrows = state.tetrahedron.arrows
-    tetrahedron.transform(matMult(rot, tr))
+    tetrahedron.transform(matMult(rot))
   },
   { deep: true },
 )

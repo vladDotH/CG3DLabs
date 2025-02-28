@@ -13,7 +13,7 @@
       <br />
       <div v-for="prop in ['xrot', 'yrot', 'zrot'] as const" :key="prop">
         <label>
-          <input v-model="state.cube[prop]" type="range" min="-100" max="100" />
+          <input v-model="state.cube[prop]" type="range" min="0" max="360" />
           {{ prop }}: {{ state.cube[prop] }}
         </label>
       </div>
@@ -47,8 +47,8 @@
           <input
             v-model="state.tetrahedron[prop]"
             type="range"
-            min="-100"
-            max="100"
+            min="0"
+            max="360"
           />
           {{ prop }}: {{ state.tetrahedron[prop] }}
         </label>
