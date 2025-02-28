@@ -26,7 +26,7 @@ export function matMult(...args: Matrix[]): Matrix {
   return mat
 }
 
-export function rotMat4(x: number, y: number, z: number) {
+export function rotMat4(x: number = 0, y: number = 0, z: number = 0) {
   const rotMat = mat4.create()
   mat4.rotateX(rotMat, rotMat, x)
   mat4.rotateY(rotMat, rotMat, y)
