@@ -16,7 +16,7 @@ import { loadShaders, useWebGL } from './gl.ts'
 import { useState } from './state.ts'
 import { Cube, Tetrahedron } from './figures.ts'
 import { matMult, rotMat4 } from './utils.ts'
-import { glMatrix, mat4, vec3 } from 'gl-matrix'
+import { glMatrix, vec3 } from 'gl-matrix'
 
 const canvas = useTemplateRef('canvas')
 
@@ -42,10 +42,12 @@ async function init() {
   state.cube.xrot = 70
   state.cube.yrot = 30
   state.cube.x = 40
+  state.cube.size = 30
 
   state.tetrahedron.xrot = 220
   state.tetrahedron.yrot = 70
   state.tetrahedron.x = -40
+  state.tetrahedron.size = 30
 
   requestAnimationFrame(render)
 }
@@ -61,7 +63,6 @@ const cube = new Cube({
     [1.0, 1.0, 0.0, 1.0], // Right face: yellow
     [1.0, 0.0, 1.0, 1.0], // Left face: purple
   ],
-  size: 0.3,
 })
 
 const tetrahedron = new Tetrahedron({
@@ -70,10 +71,10 @@ const tetrahedron = new Tetrahedron({
     [0.0, 1.0, 0.0, 1.0], // Top face: green
     [0.0, 0.0, 1.0, 1.0], // Bottom face: blue
   ],
-  size: 0.3,
 })
 
-const PosScale = 1 / 30
+const PosScale = 1 / 100,
+  SizeScale = 1 / 100
 
 watch(
   () => state.cube,
@@ -88,6 +89,7 @@ watch(
     vec3.scale(cube.position, cube.position, PosScale)
 
     cube.showArrows = state.cube.arrows
+    cube.size = state.cube.size * SizeScale
     cube.transform(rot)
   },
   { deep: true },
@@ -111,6 +113,7 @@ watch(
     vec3.scale(tetrahedron.position, tetrahedron.position, PosScale)
 
     tetrahedron.showArrows = state.tetrahedron.arrows
+    tetrahedron.size = state.tetrahedron.size * SizeScale
     tetrahedron.transform(matMult(rot))
   },
   { deep: true },

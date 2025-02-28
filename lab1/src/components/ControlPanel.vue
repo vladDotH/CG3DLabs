@@ -20,6 +20,13 @@
 
       <div>
         <label>
+          <input v-model="state.cube.size" type="range" min="0" max="100" />
+          Размер: {{ state.cube.size }}
+        </label>
+      </div>
+
+      <div>
+        <label>
           Показать направление
           <input v-model="state.cube.arrows" type="checkbox" />
         </label>
@@ -55,6 +62,18 @@
       </div>
 
       <br />
+
+      <div>
+        <label>
+          <input
+            v-model="state.tetrahedron.size"
+            type="range"
+            min="0"
+            max="100"
+          />
+          Размер: {{ state.tetrahedron.size }}
+        </label>
+      </div>
 
       <div>
         <label>

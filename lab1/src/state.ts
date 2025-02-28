@@ -10,6 +10,7 @@ export const useState = defineStore('state', () => {
     y: 0,
     z: 0,
     arrows: false,
+    size: 0,
   })
 
   const cube = reactive(params()),

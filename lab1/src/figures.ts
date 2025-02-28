@@ -31,8 +31,8 @@ export class Figure {
 
   get baseTransform() {
     const mat = mat4.create()
-    mat4.scale(mat, mat, times(3, () => this.size) as vec3)
     mat4.translate(mat, mat, this.position)
+    mat4.scale(mat, mat, times(3, () => this.size) as vec3)
     return mat
   }
 
