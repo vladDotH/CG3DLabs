@@ -70,6 +70,7 @@ const tetrahedron = new Tetrahedron({
     [1.0, 0.0, 0.0, 1.0], // Back face: red
     [0.0, 1.0, 0.0, 1.0], // Top face: green
     [0.0, 0.0, 1.0, 1.0], // Bottom face: blue
+    [1.0, 1.0, 1.0, 1.0], // Bottom face: white
   ],
 })
 
