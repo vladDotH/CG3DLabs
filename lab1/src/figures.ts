@@ -40,7 +40,7 @@ export class Figure {
     this.transformMat = mat
   }
 
-  render(gl: WebGLRenderingContext) {
+  render(gl: WebGL2RenderingContext | WebGLRenderingContext) {
     const vertBuffer = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, vertBuffer)
     gl.bufferData(
@@ -83,7 +83,7 @@ export class Figure {
   arrowPoints: number[] = []
   arrowColors: number[] = []
 
-  renderOrientationArrows(gl: WebGLRenderingContext) {
+  renderOrientationArrows(gl: WebGL2RenderingContext | WebGLRenderingContext) {
     const arrowsPoints = chunk(this.arrowPoints, 3).flatMap((p) => {
       const v = p as vec3
       vec3.transformMat4(v, v, matMult(this.baseTransform, this.transformMat))
@@ -113,7 +113,7 @@ export class Figure {
     gl.vertexAttribPointer(GLAttributes.aVertexColor, 4, gl.FLOAT, false, 0, 0)
 
     gl.lineWidth(4)
-    gl.drawArrays(gl.LINES, 0, arrowsPoints.length)
+    gl.drawArrays(gl.LINES, 0, arrowsPoints.length / 3)
   }
 }
 
