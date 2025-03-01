@@ -64,8 +64,8 @@ export async function loadShaders(gl: WebGLRenderingContext) {
 
   console.info(`
   Attached shaders: ${attachedShaders}
-  activeAttributes: ${activeAttributes}
-  activeUniforms: ${activeUniforms}
+  ActiveAttributes: ${activeAttributes}
+  ActiveUniforms: ${activeUniforms}
   `)
 
   for (const attr in GLAttributes) {
@@ -79,8 +79,9 @@ export async function loadShaders(gl: WebGLRenderingContext) {
 
 export function useWebGL(canvas: HTMLCanvasElement) {
   try {
-    // Попытаться получить стандартный контекст. Если не получится, попробовать получить экспериментальный.
+    // Попытаться получить контекст WebGL2, если не получается - WebGL, если и это не получится, попробовать получить экспериментальный.
     return (
+      canvas.getContext('webgl2') ??
       canvas.getContext('webgl') ??
       (canvas.getContext('experimental-webgl') as WebGLRenderingContext)
     )
