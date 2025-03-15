@@ -2,26 +2,86 @@
   <div v-if="error" class="alert">{{ error }}</div>
   <div v-else class="app">
     <ControlPanel class="control-panel" />
-    <canvas ref="canvas" width="640" height="480">
+    <canvas
+      ref="canvas"
+      :width="W"
+      :height="H"
+      @mousedown="onMouseDown"
+      @mousemove="onMouseMove"
+      @mouseup="onMouseUp"
+      @wheel="onScroll"
+    >
       Your browser doesn't appear to support the HTML5
       <code>&lt;canvas&gt;</code> element.
     </canvas>
+    <CameraPanel class="control-panel" />
   </div>
 </template>
 
 <script setup lang="ts">
 import ControlPanel from './components/ControlPanel.vue'
 import { onMounted, ref, useTemplateRef, watch } from 'vue'
-import { loadShaders, useWebGL } from './gl.ts'
+import { GLAttributes, loadShaders, useWebGL } from './gl.ts'
 import { useState } from './state.ts'
 import { Cube, Tetrahedron } from './figures.ts'
 import { matMult, rotMat4 } from './utils.ts'
-import { glMatrix, vec3 } from 'gl-matrix'
+import { glMatrix, mat4, vec2, vec3 } from 'gl-matrix'
+import CameraPanel from './components/CameraPanel.vue'
+import { cloneDeep } from 'es-toolkit'
 
 const canvas = useTemplateRef('canvas')
 
 const error = ref<null | string>(null)
 let gl: WebGLRenderingContext
+
+const pressed = ref(false),
+  startPos = ref(vec2.fromValues(0, 0)),
+  startCameraTarget = ref(vec3.create()),
+  cursor = ref('default')
+
+function onMouseDown(ev: MouseEvent) {
+  pressed.value = true
+  startPos.value = vec2.fromValues(ev.x, ev.y)
+  startCameraTarget.value = cloneDeep(state.camera.target)
+  cursor.value = 'move'
+}
+
+function onMouseUp() {
+  pressed.value = false
+  startPos.value = vec2.fromValues(0, 0)
+  cursor.value = 'default'
+}
+
+const W = 640,
+  H = 480,
+  cameraViewStep = 0.005
+
+function onMouseMove(ev: MouseEvent) {
+  if (pressed.value) {
+    const pos = vec2.fromValues(ev.x, ev.y)
+    const diff = vec2.subtract(vec2.create(), pos, startPos.value)
+    vec2.scale(diff, diff, cameraViewStep)
+    const diff3 = vec3.fromValues(diff[0], diff[1], 0)
+    state.camera.target = Array.from(
+      vec3.add(vec3.create(), startCameraTarget.value, diff3),
+    ) as vec3
+  }
+}
+
+const cameraMoveStep = 0.01
+function onScroll(ev: WheelEvent) {
+  const sign = -Math.sign(ev.deltaY)
+  const dir = vec3.subtract(
+    vec3.create(),
+    state.camera.target,
+    state.camera.position,
+  )
+  vec3.normalize(dir, dir)
+  vec3.scale(dir, dir, cameraMoveStep * sign)
+  state.camera.position = Array.from(
+    vec3.add(vec3.create(), state.camera.position, dir),
+  ) as vec3
+}
 
 onMounted(init)
 
@@ -48,6 +108,15 @@ async function init() {
   state.tetrahedron.yrot = 70
   state.tetrahedron.x = -40
   state.tetrahedron.size = 30
+
+  state.projection.aspect = 640 / 480
+  state.projection.fov = 90
+  state.projection.near = 0.01
+  state.projection.far = 100
+
+  state.camera.position = [0, 0, -0.5]
+  state.camera.target = [0, 0, 0]
+  state.camera.up = [0, 1, 0]
 
   requestAnimationFrame(render)
 }
@@ -120,6 +189,40 @@ watch(
   { deep: true },
 )
 
+watch(
+  () => state.projection,
+  () => {
+    let mat = mat4.create()
+    if (state.projection.perspective) {
+      mat = mat4.perspective(
+        mat,
+        glMatrix.toRadian(state.projection.fov),
+        state.projection.aspect,
+        state.projection.near,
+        state.projection.far,
+      )
+    }
+    gl.uniformMatrix4fv(GLAttributes.uProjectionMatrix, false, mat)
+  },
+  { deep: true },
+)
+
+watch(
+  () => state.camera,
+  () => {
+    const viewMatrix = mat4.create()
+    mat4.lookAt(
+      viewMatrix,
+      state.camera.position.map((v) => v) as vec3,
+      state.camera.target.map((v) => v) as vec3,
+      state.camera.up.map((v) => v) as vec3,
+    )
+
+    gl.uniformMatrix4fv(GLAttributes.uViewMatrix, false, viewMatrix)
+  },
+  { deep: true },
+)
+
 function render() {
   gl.clearColor(0, 0, 0, 1) // Очистка экрана чёрным цветом
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
@@ -135,6 +238,7 @@ function render() {
 <style scoped>
 .app {
   display: flex;
+  cursor: v-bind(cursor);
 }
 
 .alert {

@@ -1,6 +1,10 @@
+import { keys } from 'es-toolkit/compat'
+
 export const GLAttributes = {
   aPosition: 0,
   aVertexColor: 0,
+  uProjectionMatrix: WebGLUniformLocation,
+  uViewMatrix: WebGLUniformLocation,
 }
 
 // Загрузка шейдеров в папке shaders
@@ -68,13 +72,22 @@ export async function loadShaders(gl: WebGLRenderingContext) {
   ActiveUniforms: ${activeUniforms}
   `)
 
-  for (const attr in GLAttributes) {
-    GLAttributes[attr as keyof typeof GLAttributes] = gl.getAttribLocation(
-      shaderProgram,
-      attr,
-    )
-    gl.enableVertexAttribArray(GLAttributes[attr as keyof typeof GLAttributes])
-  }
+  keys(GLAttributes)
+    .filter((key) => key.startsWith('a'))
+    .forEach((key) => {
+      ;(GLAttributes[key as keyof typeof GLAttributes] as any) =
+        gl.getAttribLocation(shaderProgram, key)
+      gl.enableVertexAttribArray(
+        GLAttributes[key as keyof typeof GLAttributes] as any,
+      )
+    })
+
+  keys(GLAttributes)
+    .filter((key) => key.startsWith('u'))
+    .forEach((key) => {
+      ;(GLAttributes[key as keyof typeof GLAttributes] as any) =
+        gl.getUniformLocation(shaderProgram, key)!
+    })
 }
 
 export function useWebGL(canvas: HTMLCanvasElement) {
