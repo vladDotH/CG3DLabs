@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import ControlPanel from './components/ControlPanel.vue'
-import { onMounted, ref, useTemplateRef, watch } from 'vue'
+import { onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue'
 import { GLAttributes, loadShaders, useWebGL } from './gl.ts'
 import { useState } from './state.ts'
 import { Cube, Tetrahedron } from './figures.ts'
@@ -68,7 +68,33 @@ function onMouseMove(ev: MouseEvent) {
   }
 }
 
-const cameraMoveStep = 0.01
+const cameraMoveStep = 0.025
+function onKeydown(ev: KeyboardEvent) {
+  const dir = vec3.subtract(
+      vec3.create(),
+      state.camera.target,
+      state.camera.position,
+    ),
+    up = vec3.subtract(vec3.create(), state.camera.up, state.camera.position)
+  if (ev.key == 'w') {
+    /**/
+  } else if (ev.key == 's') {
+    vec3.scale(dir, dir, -1)
+  } else if (ev.key == 'a') {
+    vec3.cross(dir, dir, up)
+  } else if (ev.key == 'd') {
+    vec3.cross(dir, dir, up)
+    vec3.scale(dir, dir, -1)
+  } else {
+    return
+  }
+
+  vec3.normalize(dir, dir)
+  vec3.scale(dir, dir, cameraMoveStep)
+  state.camera.position = Array.from(
+    vec3.add(vec3.create(), state.camera.position, dir),
+  ) as vec3
+}
 function onScroll(ev: WheelEvent) {
   const sign = -Math.sign(ev.deltaY)
   const dir = vec3.subtract(
@@ -83,7 +109,14 @@ function onScroll(ev: WheelEvent) {
   ) as vec3
 }
 
-onMounted(init)
+onMounted(async () => {
+  await init()
+  window.addEventListener('keydown', onKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', onKeydown)
+})
 
 async function init() {
   if (!canvas.value) {
