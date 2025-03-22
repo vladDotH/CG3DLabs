@@ -41,7 +41,7 @@
             <input
               v-model.number="state.projection.near"
               type="range"
-              min="0"
+              min="0.01"
               max="5"
               step="0.01"
             />
