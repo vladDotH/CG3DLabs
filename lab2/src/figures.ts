@@ -22,9 +22,10 @@ export class Figure {
   get points() {
     const pos = vec3.clone(this.position)
     vec3.transformMat4(pos, pos, this.transformMat)
+    const mat = matMult(this.baseTransform, this.transformMat)
     return chunk(this.initialPoints, 3).flatMap((p) => {
       const v = p as vec3
-      vec3.transformMat4(v, v, matMult(this.baseTransform, this.transformMat))
+      vec3.transformMat4(v, v, mat)
       return v as number[]
     })
   }
