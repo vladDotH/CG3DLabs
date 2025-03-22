@@ -151,7 +151,7 @@ function onReset() {
   state.projection.aspect = 640 / 480
   state.projection.fov = 90
   state.projection.near = 0.01
-  state.projection.far = 100
+  state.projection.far = 5
 
   state.projection.perspective = true
   state.camera.position = [0, 0, -1]

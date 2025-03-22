@@ -42,7 +42,7 @@
               v-model.number="state.projection.near"
               type="range"
               min="0"
-              max="10"
+              max="5"
               step="0.01"
             />
             Near: {{ state.projection.near }}
@@ -55,7 +55,7 @@
               v-model.number="state.projection.far"
               type="range"
               min="0"
-              max="100"
+              max="5"
               step="0.01"
             />
             Far: {{ state.projection.far }}
