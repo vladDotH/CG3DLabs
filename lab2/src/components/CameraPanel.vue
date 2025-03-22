@@ -8,13 +8,10 @@
           <label>
             <input
               v-model.number="state.camera[key][i]"
-              type="range"
-              min="-1.5"
-              max="1.5"
-              step="0.01"
+              type="number"
+              step="0.1"
             />
             {{ key }}-{{ coordDict[i] }}:
-            {{ Math.round(state.camera[key][i] * 100) / 100 }}
           </label>
         </div>
       </div>
@@ -44,8 +41,8 @@
             <input
               v-model.number="state.projection.near"
               type="range"
-              min="-1.5"
-              max="1.5"
+              min="0"
+              max="10"
               step="0.01"
             />
             Near: {{ state.projection.near }}
@@ -58,13 +55,15 @@
               v-model.number="state.projection.far"
               type="range"
               min="0"
-              max="2"
+              max="100"
               step="0.01"
             />
             Far: {{ state.projection.far }}
           </label>
         </div>
       </template>
+
+      <button @click="emit('reset')">Сбросить</button>
     </div>
   </div>
 </template>
@@ -75,6 +74,8 @@ import { useState } from '../state.ts'
 const state = useState()
 
 const coordDict = 'xyz'.split('')
+
+const emit = defineEmits<{ (e: 'reset'): void }>()
 </script>
 
 <style scoped>

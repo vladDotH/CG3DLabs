@@ -14,7 +14,7 @@
       Your browser doesn't appear to support the HTML5
       <code>&lt;canvas&gt;</code> element.
     </canvas>
-    <CameraPanel class="control-panel" />
+    <CameraPanel class="control-panel" @reset="onReset" />
   </div>
 </template>
 
@@ -142,16 +142,21 @@ async function init() {
   state.tetrahedron.x = -40
   state.tetrahedron.size = 30
 
+  onReset()
+
+  requestAnimationFrame(render)
+}
+
+function onReset() {
   state.projection.aspect = 640 / 480
   state.projection.fov = 90
   state.projection.near = 0.01
   state.projection.far = 100
 
-  state.camera.position = [0, 0, -0.5]
+  state.projection.perspective = true
+  state.camera.position = [0, 0, -1]
   state.camera.target = [0, 0, 0]
   state.camera.up = [0, 1, 0]
-
-  requestAnimationFrame(render)
 }
 
 const state = useState()
