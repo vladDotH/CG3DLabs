@@ -239,6 +239,8 @@ watch(
         state.projection.near,
         state.projection.far,
       )
+    } else {
+      mat = mat4.ortho(mat, -1, 1, -1, 1, -10, 10)
     }
     gl.uniformMatrix4fv(GLAttributes.uProjectionMatrix, false, mat)
   },
