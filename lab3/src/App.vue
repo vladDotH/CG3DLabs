@@ -21,11 +21,17 @@
 <script setup lang="ts">
 import ControlPanel from './components/ControlPanel.vue'
 import { onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue'
-import { GLAttributes, loadShaders, useWebGL } from './gl.ts'
+import {
+  GLAttributes,
+  loadShaders,
+  setLight,
+  setMaterial,
+  useWebGL,
+} from './gl.ts'
 import { useState } from './state.ts'
 import { Cube, Tetrahedron } from './figures.ts'
 import { matMult, rotMat4 } from './utils.ts'
-import { glMatrix, mat4, vec2, vec3 } from 'gl-matrix'
+import { glMatrix, mat4, vec2, vec3, vec4 } from 'gl-matrix'
 import CameraPanel from './components/CameraPanel.vue'
 import { cloneDeep } from 'es-toolkit'
 
@@ -143,6 +149,13 @@ async function init() {
   state.tetrahedron.size = 30
 
   onReset()
+
+  state.material = {
+    diffuse: [200, 200, 200, 255],
+    ambient: [255, 255, 255, 255],
+    specular: [200, 200, 200, 255],
+    shininess: 0.5,
+  }
 
   requestAnimationFrame(render)
 }
@@ -263,6 +276,38 @@ watch(
   { deep: true },
 )
 
+watch(
+  () => state.material,
+  () => {
+    if (!gl) return
+    const material = cloneDeep(state.material)
+    vec4.scale(material.ambient, material.ambient, 1 / 255)
+    vec4.scale(material.diffuse, material.diffuse, 1 / 255)
+    vec4.scale(material.specular, material.specular, 1 / 255)
+    setMaterial(gl, material)
+  },
+  { deep: true },
+)
+
+watch(
+  () => state.light,
+  () => {
+    if (!gl) return
+    const light = cloneDeep(state.light)
+
+    gl.uniform1i(GLAttributes.uPhong, +light.phong)
+    gl.uniform1i(GLAttributes.uLightsCount, light.count)
+
+    light.lights.forEach((v, i) => {
+      vec4.scale(v.ambient, v.ambient, 1 / 255)
+      vec4.scale(v.diffuse, v.diffuse, 1 / 255)
+      vec4.scale(v.specular, v.specular, 1 / 255)
+      setLight(gl, i, v)
+    })
+  },
+  { deep: true },
+)
+
 function render() {
   gl.clearColor(0, 0, 0, 1) // Очистка экрана чёрным цветом
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
@@ -289,5 +334,10 @@ function render() {
 
 .control-panel {
   width: 300px;
+}
+
+canvas {
+  width: 640px;
+  height: 480px;
 }
 </style>

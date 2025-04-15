@@ -1,3 +1,5 @@
+precision highp float;
+
 struct Light {
     vec4 diffuse;
     vec4 ambient;
@@ -17,18 +19,19 @@ const int MaxLights = 2;
 uniform mat4 uProjectionMatrix;
 uniform mat4 uViewMatrix;
 uniform mat3 uNormalMatrix;
-uniform Light uLights[MaxLights];
-uniform int uLightsCount;
+
+uniform mediump int uLightsCount;
 uniform bool uPhong;
+uniform Light uLights[MaxLights];
 uniform Material uMaterial;
 
 attribute vec3 aPosition;
 attribute vec4 aVertexColor;
 attribute vec3 aNormal;
 
-varying highp vec4 vColor;
-varying highp vec3 vNormal;
-varying highp vec4 vPosition;
+varying vec4 vColor;
+varying vec3 vNormal;
+varying vec4 vPosition;
 
 vec4 lightCalc(in Light l) {
     vec3 L;
@@ -47,7 +50,7 @@ vec4 lightCalc(in Light l) {
     float difCoef = max(dot(vNormal, L), 0.0);
 
     vec4 color = specCoef * uMaterial.specular * l.specular
-    + difCoef * uMaterial.diffuse * l.diffuse * aVertexColor
+    + difCoef * uMaterial.diffuse * l.diffuse
     + uMaterial.ambient * l.ambient * aVertexColor;
 
     return color;

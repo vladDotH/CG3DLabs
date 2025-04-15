@@ -10,6 +10,7 @@
     "lint": "eslint --fix 'src/**/*.ts' 'src/**/*.vue'"
   },
   "dependencies": {
+    "color-string": "^2.0.1",
     "es-toolkit": "^1.32.0",
     "gl-matrix": "^3.4.3",
     "pinia": "^3.0.1",

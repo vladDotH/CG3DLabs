@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { reactive } from 'vue'
-import type { vec3 } from 'gl-matrix'
+import { type vec3, vec4 } from 'gl-matrix'
 
 export const useState = defineStore('state', () => {
   const params = () => ({
@@ -31,5 +31,23 @@ export const useState = defineStore('state', () => {
     up: [0, 0, 0] as vec3,
   })
 
-  return { cube, tetrahedron, projection, camera }
+  const material = reactive({
+    diffuse: [200, 200, 200, 255] as vec4,
+    ambient: [255, 255, 255, 255] as vec4,
+    specular: [200, 200, 200, 255] as vec4,
+    shininess: 0.3,
+  })
+
+  const light = reactive({
+    phong: true,
+    count: 0,
+    lights: [] as {
+      diffuse: vec4
+      ambient: vec4
+      specular: vec4
+      position: vec4
+    }[],
+  })
+
+  return { cube, tetrahedron, projection, camera, material, light }
 })

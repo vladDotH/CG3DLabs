@@ -1,6 +1,6 @@
-import { mat4, vec3, vec4 } from 'gl-matrix'
+import { mat3, mat4, vec3, vec4 } from 'gl-matrix'
 import { times } from 'es-toolkit/compat'
-import { chunk } from 'es-toolkit'
+import { chunk, flattenDeep } from 'es-toolkit'
 import { GLAttributes } from './gl.ts'
 import { matMult } from './utils.ts'
 
@@ -30,6 +30,10 @@ export class Figure {
     })
   }
 
+  get normals(): number[] {
+    return []
+  }
+
   get baseTransform() {
     const mat = mat4.create()
     mat4.translate(mat, mat, this.position)
@@ -47,6 +51,14 @@ export class Figure {
     gl.bufferData(
       gl.ARRAY_BUFFER,
       new Float32Array(this.points),
+      gl.STATIC_DRAW,
+    )
+
+    const normBuffer = gl.createBuffer()
+    gl.bindBuffer(gl.ARRAY_BUFFER, normBuffer)
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array(this.normals),
       gl.STATIC_DRAW,
     )
 
@@ -72,7 +84,17 @@ export class Figure {
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer)
     gl.vertexAttribPointer(GLAttributes.aVertexColor, 4, gl.FLOAT, false, 0, 0)
 
+    gl.bindBuffer(gl.ARRAY_BUFFER, normBuffer)
+    gl.vertexAttribPointer(GLAttributes.aNormal, 3, gl.FLOAT, false, 0, 0)
+
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer)
+
+    const normMat = mat3.normalFromMat4(
+      mat3.create(),
+      matMult(this.baseTransform, this.transformMat),
+    )
+    gl.uniformMatrix3fv(GLAttributes.uNormalMatrix, false, normMat)
+
     gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0)
 
     if (this.showArrows) {
@@ -134,6 +156,23 @@ export class Cube extends Figure {
     -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0,
   ]
 
+  get normals() {
+    return flattenDeep(
+      times(6, (i) => {
+        const [p1, p2, p3] = chunk(
+          this.initialPoints.slice(i * 12, i * 12 + 9),
+          3,
+        ) as vec3[]
+
+        const v1 = vec3.sub(vec3.create(), p1, p2),
+          v2 = vec3.sub(vec3.create(), p2, p3)
+        const norm = vec3.cross(vec3.create(), v1, v2)
+        vec3.normalize(norm, norm)
+        return times(4, () => Array.from(norm))
+      }),
+    )
+  }
+
   indices = [
     // Front
     0, 1, 2, 0, 2, 3,
@@ -191,6 +230,19 @@ export class Tetrahedron extends Figure {
     // Вершина 4
     1, -1, -1,
   ]
+
+  get normals() {
+    return [
+      // Вершина 1
+      1, 1, 1,
+      // Вершина 2
+      -1, -1, 1,
+      // Вершина 3
+      -1, 1, -1,
+      // Вершина 4
+      1, -1, -1,
+    ]
+  }
 
   indices = [
     // Грань 1
