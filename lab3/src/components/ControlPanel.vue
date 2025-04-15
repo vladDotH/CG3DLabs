@@ -33,55 +33,55 @@
       </div>
     </div>
 
-    <!--    <div class="item">-->
-    <!--      <label style="font-size: 20px">Tetrahedron</label>-->
-    <!--      <hr />-->
+    <div class="item">
+      <label style="font-size: 20px">Tetrahedron</label>
+      <hr />
 
-    <!--      <div v-for="prop in ['x', 'y', 'z'] as const" :key="prop">-->
-    <!--        <label>-->
-    <!--          <input-->
-    <!--            v-model="state.tetrahedron[prop]"-->
-    <!--            type="range"-->
-    <!--            min="-100"-->
-    <!--            max="100"-->
-    <!--          />-->
-    <!--          {{ prop.toUpperCase() }}: {{ state.tetrahedron[prop] }}-->
-    <!--        </label>-->
-    <!--      </div>-->
-    <!--      <br />-->
-    <!--      <div v-for="prop in ['xrot', 'yrot', 'zrot'] as const" :key="prop">-->
-    <!--        <label>-->
-    <!--          <input-->
-    <!--            v-model="state.tetrahedron[prop]"-->
-    <!--            type="range"-->
-    <!--            min="0"-->
-    <!--            max="360"-->
-    <!--          />-->
-    <!--          {{ prop }}: {{ state.tetrahedron[prop] }}-->
-    <!--        </label>-->
-    <!--      </div>-->
+      <div v-for="prop in ['x', 'y', 'z'] as const" :key="prop">
+        <label>
+          <input
+            v-model="state.tetrahedron[prop]"
+            type="range"
+            min="-100"
+            max="100"
+          />
+          {{ prop.toUpperCase() }}: {{ state.tetrahedron[prop] }}
+        </label>
+      </div>
+      <br />
+      <div v-for="prop in ['xrot', 'yrot', 'zrot'] as const" :key="prop">
+        <label>
+          <input
+            v-model="state.tetrahedron[prop]"
+            type="range"
+            min="0"
+            max="360"
+          />
+          {{ prop }}: {{ state.tetrahedron[prop] }}
+        </label>
+      </div>
 
-    <!--      <br />-->
+      <br />
 
-    <!--      <div>-->
-    <!--        <label>-->
-    <!--          <input-->
-    <!--            v-model="state.tetrahedron.size"-->
-    <!--            type="range"-->
-    <!--            min="0"-->
-    <!--            max="100"-->
-    <!--          />-->
-    <!--          Размер: {{ state.tetrahedron.size }}-->
-    <!--        </label>-->
-    <!--      </div>-->
+      <div>
+        <label>
+          <input
+            v-model="state.tetrahedron.size"
+            type="range"
+            min="0"
+            max="100"
+          />
+          Размер: {{ state.tetrahedron.size }}
+        </label>
+      </div>
 
-    <!--      <div>-->
-    <!--        <label>-->
-    <!--          Показать направление-->
-    <!--          <input v-model="state.tetrahedron.arrows" type="checkbox" />-->
-    <!--        </label>-->
-    <!--      </div>-->
-    <!--    </div>-->
+      <div>
+        <label>
+          Показать направление
+          <input v-model="state.tetrahedron.arrows" type="checkbox" />
+        </label>
+      </div>
+    </div>
 
     <div class="item">
       <label style="font-size: 20px">Material</label>
