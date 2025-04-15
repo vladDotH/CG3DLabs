@@ -105,7 +105,7 @@
               <input
                 v-model.number="state.light.lights[i].position[j]"
                 type="number"
-                step="0.1"
+                step="0.05"
               />
               pos-{{ coordDict[j] }}:
             </label>
@@ -123,6 +123,7 @@ import { useState } from '../state.ts'
 import { MaxLights } from '../gl.ts'
 import { vec4 } from 'gl-matrix'
 import ColorInput from './ColorInput.vue'
+import { onMounted } from 'vue'
 
 const state = useState()
 
@@ -144,6 +145,10 @@ function removeLight() {
   state.light.count--
   state.light.lights.splice(state.light.lights.length - 1, 1)
 }
+
+onMounted(() => {
+  addLight()
+})
 </script>
 
 <style scoped>
