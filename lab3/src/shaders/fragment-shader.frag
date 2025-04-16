@@ -40,8 +40,6 @@ vec4 lightCalc(in Light l) {
 
     vec3 viewDir = normalize(-vPosition.xyz);
     vec3 reflectDir = reflect(-L, vNormal);
-    //    vec3 E = -normalize(vPosition.xyz);
-    //    vec3 H = normalize(L + E);
     float specCoef = pow(max(dot(viewDir, reflectDir), 0.0), uMaterial.shininess);
     float difCoef = max(dot(vNormal, L), 0.0);
 
