@@ -14,7 +14,7 @@
       Your browser doesn't appear to support the HTML5
       <code>&lt;canvas&gt;</code> element.
     </canvas>
-    <CameraPanel class="control-panel" @reset="onReset" />
+    <CameraPanel ref="cameraPanel" class="control-panel" @reset="onReset" />
   </div>
 </template>
 
@@ -36,6 +36,7 @@ import CameraPanel from './components/CameraPanel.vue'
 import { cloneDeep } from 'es-toolkit'
 
 const canvas = useTemplateRef('canvas')
+const cameraPanel = useTemplateRef('cameraPanel')
 
 const error = ref<null | string>(null)
 let gl: WebGLRenderingContext
@@ -130,13 +131,15 @@ async function init() {
     return
   }
 
-  gl = useWebGL(canvas.value)!
+  const newgl = useWebGL(canvas.value)!
   if (!canvas.value) {
     error.value = 'Не удалось загрузить WebGL 😥'
   }
 
-  gl.viewport(0, 0, canvas.value.width, canvas.value.height)
-  await loadShaders(gl)
+  newgl.viewport(0, 0, canvas.value.width, canvas.value.height)
+  await loadShaders(newgl)
+
+  gl = newgl
 
   state.cube.xrot = 70
   state.cube.yrot = 30
@@ -156,6 +159,8 @@ async function init() {
     specular: [200, 200, 200, 255],
     shininess: 0.5,
   }
+
+  cameraPanel.value!.addLight()
 
   requestAnimationFrame(render)
 }

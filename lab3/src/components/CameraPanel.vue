@@ -123,7 +123,6 @@ import { useState } from '../state.ts'
 import { MaxLights } from '../gl.ts'
 import { vec4 } from 'gl-matrix'
 import ColorInput from './ColorInput.vue'
-import { onMounted } from 'vue'
 
 const state = useState()
 
@@ -146,9 +145,7 @@ function removeLight() {
   state.light.lights.splice(state.light.lights.length - 1, 1)
 }
 
-onMounted(() => {
-  addLight()
-})
+defineExpose({ addLight })
 </script>
 
 <style scoped>
