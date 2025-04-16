@@ -58,6 +58,7 @@ void main(void) {
 
     vec4 color = vec4(0,0,0,0);
     for (int i = 0; i < MaxLights; i++) {
+        if (i >= uLightsCount) break;
         color += lightCalc(uLights[i]);
     }
     color.a = 1.0;
