@@ -24,16 +24,20 @@ uniform mediump int uLightsCount;
 uniform bool uPhong;
 uniform Light uLights[MaxLights];
 uniform Material uMaterial;
+uniform bool uUseTexture;
+uniform sampler2D uTexture;
 
 attribute vec3 aPosition;
 attribute vec4 aVertexColor;
 attribute vec3 aNormal;
+attribute vec2 aTexCoord;
 
 varying vec4 vColor;
 varying vec3 vNormal;
 varying vec4 vPosition;
+varying vec2 vTexCoord;
 
-vec4 lightCalc(in Light l) {
+vec4 lightCalc(in Light l, in vec4 lColor) {
     vec3 L;
     if (l.position.w == 0.0) {
         L = normalize(l.position.xyz);
@@ -49,7 +53,7 @@ vec4 lightCalc(in Light l) {
 
     vec4 color = specCoef * uMaterial.specular * l.specular
     + difCoef * uMaterial.diffuse * l.diffuse
-    + uMaterial.ambient * l.ambient * aVertexColor;
+    + uMaterial.ambient * l.ambient * lColor;
 
     return color;
 }
@@ -58,17 +62,23 @@ void main(void) {
     vPosition = uViewMatrix * vec4(aPosition, 1.0);
     gl_Position = uProjectionMatrix * uViewMatrix * vec4(aPosition, 1.0);
     vNormal = normalize(uNormalMatrix * aNormal);
+    vTexCoord = aTexCoord;
 
-    vColor = aVertexColor;
+    vec4 lColor = aVertexColor;
+
+    if (uUseTexture == true) {
+        lColor = texture2D(uTexture, vTexCoord);
+    }
 
     if (uPhong == true || uLightsCount <= 0) {
+        vColor = lColor;
         return;
     }
 
-    vColor = vec4(0,0,0,0);
+    vColor = vec4(0, 0, 0, 0);
     for (int i = 0; i < MaxLights; i++) {
         if (i >= uLightsCount) break;
-        vColor += lightCalc(uLights[i]);
+        vColor += lightCalc(uLights[i], lColor);
     }
     vColor.a = 1.0;
 }

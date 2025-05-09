@@ -112,6 +112,11 @@
           step="0.01"
         />
       </label>
+
+      <label>
+        Textures
+        <input v-model.number="state.material.textures" type="checkbox" />
+      </label>
     </div>
   </div>
 </template>

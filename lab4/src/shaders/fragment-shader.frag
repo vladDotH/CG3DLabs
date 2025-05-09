@@ -24,12 +24,15 @@ uniform mediump int uLightsCount;
 uniform bool uPhong;
 uniform Light uLights[MaxLights];
 uniform Material uMaterial;
+uniform bool uUseTexture;
+uniform sampler2D uTexture;
 
 varying vec4 vColor;
 varying vec3 vNormal;
 varying vec4 vPosition;
+varying vec2 vTexCoord;
 
-vec4 lightCalc(in Light l) {
+vec4 lightCalc(in Light l, in vec4 lColor) {
     vec3 L;
     if (l.position.w == 0.0) {
         L = normalize(l.position.xyz);
@@ -45,21 +48,30 @@ vec4 lightCalc(in Light l) {
 
     vec4 color = specCoef * uMaterial.specular * l.specular
     + difCoef * uMaterial.diffuse * l.diffuse
-    + uMaterial.ambient * l.ambient * vColor;
+    + uMaterial.ambient * l.ambient * lColor;
 
     return color;
 }
 
 void main(void) {
-    gl_FragColor = vColor;
+    vec4 lColor = vColor;
+    if (uUseTexture == true) {
+        lColor = texture2D(uTexture, vTexCoord);
+    }
+
     if (uPhong == false || uLightsCount <= 0) {
+        if (uUseTexture) {
+            gl_FragColor = lColor/2.0 + vColor/2.0;
+        } else {
+            gl_FragColor = lColor;
+        }
         return;
     }
 
     vec4 color = vec4(0,0,0,0);
     for (int i = 0; i < MaxLights; i++) {
         if (i >= uLightsCount) break;
-        color += lightCalc(uLights[i]);
+        color += lightCalc(uLights[i], lColor);
     }
     color.a = 1.0;
 

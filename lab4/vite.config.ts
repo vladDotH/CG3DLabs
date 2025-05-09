@@ -5,5 +5,5 @@ import glsl from 'vite-plugin-glsl'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [vue(), glsl()],
-  base: '/cg/lab3/',
+  base: '/cg/lab4/',
 })

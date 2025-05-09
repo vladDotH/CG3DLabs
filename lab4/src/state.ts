@@ -36,6 +36,7 @@ export const useState = defineStore('state', () => {
     ambient: [255, 255, 255, 255] as vec4,
     specular: [200, 200, 200, 255] as vec4,
     shininess: 0.3,
+    textures: true,
   })
 
   const light = reactive({

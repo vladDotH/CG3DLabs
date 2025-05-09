@@ -1,22 +1,28 @@
 import { mat3, mat4, vec3, vec4 } from 'gl-matrix'
 import { times } from 'es-toolkit/compat'
 import { chunk, flattenDeep } from 'es-toolkit'
-import { GLAttributes } from './gl.ts'
+import { GLAttributes, loadTexture } from './gl.ts'
 import { matMult } from './utils.ts'
 
 export class Figure {
   initialPoints: number[] = []
   indices: number[] = []
+  texCoords: number[] = []
 
   position = vec3.fromValues(0, 0, 0)
   transformMat = mat4.create()
   size = 0.5
 
   colors: number[] = []
+  tex?: WebGLTexture
 
   constructor(props: { position?: vec3; size?: number }) {
     this.position = props.position ?? this.position
     this.size = props.size ?? this.size
+  }
+
+  async loadTexture(gl: WebGLRenderingContext, url: string) {
+    this.tex = await loadTexture(gl, url)
   }
 
   get points() {
@@ -95,6 +101,23 @@ export class Figure {
     )
     gl.uniformMatrix3fv(GLAttributes.uNormalMatrix, false, normMat)
 
+    if (this.tex) {
+      const texCoordBuffer = gl.createBuffer()
+      gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer)
+      gl.bufferData(
+        gl.ARRAY_BUFFER,
+        new Float32Array(this.texCoords),
+        gl.STATIC_DRAW,
+      )
+
+      gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer)
+      gl.vertexAttribPointer(GLAttributes.aTexCoord, 2, gl.FLOAT, false, 0, 0)
+
+      gl.activeTexture(gl.TEXTURE0)
+      gl.bindTexture(gl.TEXTURE_2D, this.tex)
+      gl.uniform1i(GLAttributes.uTexture, 0)
+    }
+
     gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0)
 
     if (this.showArrows) {
@@ -154,6 +177,21 @@ export class Cube extends Figure {
     1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0,
     // Left face
     -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0,
+  ]
+
+  texCoords = [
+    // Front
+    0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
+    // Back
+    0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
+    // Top
+    0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
+    // Bottom
+    0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
+    // Right
+    0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
+    // Left
+    0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
   ]
 
   get normals() {
@@ -230,6 +268,8 @@ export class Tetrahedron extends Figure {
     // Вершина 4
     1, -1, -1,
   ]
+
+  texCoords = [0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0]
 
   get normals() {
     return [

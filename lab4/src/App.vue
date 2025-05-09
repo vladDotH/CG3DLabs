@@ -102,6 +102,7 @@ function onKeydown(ev: KeyboardEvent) {
     vec3.add(vec3.create(), state.camera.position, dir),
   ) as vec3
 }
+
 function onScroll(ev: WheelEvent) {
   const sign = -Math.sign(ev.deltaY)
   const dir = vec3.subtract(
@@ -151,6 +152,9 @@ async function init() {
   state.tetrahedron.x = -40
   state.tetrahedron.size = 30
 
+  await cube.loadTexture(gl, 'wood.jpg')
+  await tetrahedron.loadTexture(gl, 'wood.jpg')
+
   onReset()
 
   state.material = {
@@ -158,10 +162,12 @@ async function init() {
     ambient: [255, 255, 255, 255],
     specular: [200, 200, 200, 255],
     shininess: 0.5,
+    textures: true,
   }
 
   cameraPanel.value!.addLight()
 
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
   requestAnimationFrame(render)
 }
 
@@ -289,6 +295,7 @@ watch(
     vec4.scale(material.ambient, material.ambient, 1 / 255)
     vec4.scale(material.diffuse, material.diffuse, 1 / 255)
     vec4.scale(material.specular, material.specular, 1 / 255)
+    gl.uniform1i(GLAttributes.uUseTexture, +material.textures)
     setMaterial(gl, material)
   },
   { deep: true },

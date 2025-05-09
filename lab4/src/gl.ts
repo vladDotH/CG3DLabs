@@ -6,12 +6,15 @@ export const GLAttributes = {
   aPosition: 0,
   aVertexColor: 0,
   aNormal: 0,
+  aTexCoord: 0,
 
   uProjectionMatrix: WebGLUniformLocation,
   uViewMatrix: WebGLUniformLocation,
   uLightsCount: WebGLUniformLocation,
   uPhong: WebGLUniformLocation,
   uNormalMatrix: WebGLUniformLocation,
+  uUseTexture: WebGLUniformLocation,
+  uTexture: WebGLUniformLocation,
 
   Lights: times(MaxLights, () => ({
     diffuse: WebGLUniformLocation,
@@ -158,4 +161,67 @@ export function setLight(gl: WebGLRenderingContext, index: number, obj: any) {
   gl.uniform4fv(GLAttributes.Lights[index].diffuse, obj.diffuse)
   gl.uniform4fv(GLAttributes.Lights[index].specular, obj.specular)
   gl.uniform4fv(GLAttributes.Lights[index].position, obj.position)
+}
+
+export async function loadTexture(
+  gl: WebGLRenderingContext,
+  url: string,
+): Promise<WebGLTexture> {
+  const texture = gl.createTexture()
+  gl.bindTexture(gl.TEXTURE_2D, texture)
+
+  const level = 0
+  const internalFormat = gl.RGBA
+  const width = 1
+  const height = 1
+  const border = 0
+  const srcFormat = gl.RGBA
+  const srcType = gl.UNSIGNED_BYTE
+  const pixel = new Uint8Array([0, 0, 255, 255]) // opaque blue
+  gl.texImage2D(
+    gl.TEXTURE_2D,
+    level,
+    internalFormat,
+    width,
+    height,
+    border,
+    srcFormat,
+    srcType,
+    pixel,
+  )
+
+  const image = new Image()
+  image.src = url
+
+  await new Promise<void>((resolve, reject) => {
+    image.onload = () => {
+      gl.bindTexture(gl.TEXTURE_2D, texture)
+      gl.texImage2D(
+        gl.TEXTURE_2D,
+        level,
+        internalFormat,
+        srcFormat,
+        srcType,
+        image,
+      )
+
+      if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
+        gl.generateMipmap(gl.TEXTURE_2D)
+      } else {
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+      }
+
+      resolve()
+    }
+
+    image.onerror = reject
+  })
+
+  return texture
+}
+
+function isPowerOf2(value: number) {
+  return (value & (value - 1)) === 0
 }
