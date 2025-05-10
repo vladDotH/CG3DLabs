@@ -136,7 +136,7 @@ function addLight() {
     diffuse: [180, 180, 180, 255] as vec4,
     ambient: [220, 220, 220, 255] as vec4,
     specular: [240, 240, 240, 255] as vec4,
-    position: [-0.8, 0, -0.9, 1] as vec4,
+    position: [-0.8, 0.5, -0.9, 1] as vec4,
   })
 }
 

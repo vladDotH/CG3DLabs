@@ -29,7 +29,7 @@ import {
   useWebGL,
 } from './gl.ts'
 import { useState } from './state.ts'
-import { Cube, Tetrahedron } from './figures.ts'
+import { Cube, Plane, Tetrahedron } from './figures.ts'
 import { matMult, rotMat4 } from './utils.ts'
 import { glMatrix, mat4, vec2, vec3, vec4 } from 'gl-matrix'
 import CameraPanel from './components/CameraPanel.vue'
@@ -142,26 +142,35 @@ async function init() {
 
   gl = newgl
 
-  state.cube.xrot = 70
-  state.cube.yrot = 30
+  state.cube.yrot = 20
   state.cube.x = 40
   state.cube.size = 30
+  state.cube.y = -20
 
-  state.tetrahedron.xrot = 220
-  state.tetrahedron.yrot = 70
+  state.carpet.xrot = 90
+  state.carpet.y = -50
+  state.carpet.size = 300
+
+  state.tetrahedron.xrot = 45
+  state.tetrahedron.yrot = 135
+  state.tetrahedron.zrot = 10
   state.tetrahedron.x = -40
   state.tetrahedron.size = 30
+  state.tetrahedron.y = -29
 
-  await cube.loadTexture(gl, 'wood.jpg')
-  await tetrahedron.loadTexture(gl, 'wood.jpg')
+  await Promise.all([
+    cube.loadTexture(gl, 'wood1024.jpg'),
+    tetrahedron.loadTexture(gl, 'wood256.jpg'),
+    carpet.loadTexture(gl, 'carpet1024.jpg'),
+  ])
 
   onReset()
 
   state.material = {
     diffuse: [200, 200, 200, 255],
     ambient: [255, 255, 255, 255],
-    specular: [200, 200, 200, 255],
-    shininess: 0.5,
+    specular: [120, 120, 120, 255],
+    shininess: 1.5,
     textures: true,
   }
 
@@ -178,7 +187,7 @@ function onReset() {
   state.projection.far = 5
 
   state.projection.perspective = true
-  state.camera.position = [0, 0, -1]
+  state.camera.position = [0, 0.3, -1]
   state.camera.target = [0, 0, 0]
   state.camera.up = [0, 1, 0]
 }
@@ -205,8 +214,42 @@ const tetrahedron = new Tetrahedron({
   ],
 })
 
+const carpet = new Plane({
+  colors: [
+    [1.0, 1.0, 1.0, 1.0], // Front face: white
+    [1.0, 1.0, 1.0, 1.0], // Front face: white
+    [1.0, 1.0, 1.0, 1.0], // Front face: white
+    [1.0, 1.0, 1.0, 1.0], // Front face: white
+    [1.0, 1.0, 1.0, 1.0], // Front face: white
+    [1.0, 1.0, 1.0, 1.0], // Front face: white
+  ],
+})
+
 const PosScale = 1 / 100,
   SizeScale = 1 / 100
+
+watch(
+  () => state.carpet,
+  () => {
+    const rot = rotMat4(
+      glMatrix.toRadian(state.carpet.xrot),
+      glMatrix.toRadian(state.carpet.yrot),
+      glMatrix.toRadian(state.carpet.zrot),
+    )
+
+    carpet.position = vec3.fromValues(
+      state.carpet.x,
+      state.carpet.y,
+      state.carpet.z,
+    )
+    vec3.scale(carpet.position, carpet.position, PosScale)
+
+    carpet.showArrows = state.carpet.arrows
+    carpet.size = state.carpet.size * SizeScale
+    carpet.transform(rot)
+  },
+  { deep: true },
+)
 
 watch(
   () => state.cube,
@@ -327,6 +370,7 @@ function render() {
 
   cube.render(gl)
   tetrahedron.render(gl)
+  carpet.render(gl)
 
   requestAnimationFrame(render)
 }

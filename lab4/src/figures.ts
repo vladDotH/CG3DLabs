@@ -321,3 +321,59 @@ export class Tetrahedron extends Figure {
     0.7, 0.7, 0.7, 1,
   ]).flat()
 }
+
+export class Plane extends Figure {
+  initialPoints = [
+    // Вершина 1
+    1, 1, 0,
+    // Вершина 2
+    -1, -1, 0,
+    // Вершина 3
+    -1, 1, 0,
+    // Вершина 4
+    1, -1, 0,
+  ]
+
+  texCoords = [0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0]
+
+  get normals() {
+    return [
+      // Вершина 1
+      1, 1, 1,
+      // Вершина 2
+      -1, -1, 1,
+      // Вершина 3
+      -1, 1, -1,
+      // Вершина 4
+      1, -1, -1,
+    ]
+  }
+
+  indices = [0, 1, 2, 0, 1, 3]
+
+  colors = [] as number[]
+
+  position = vec3.fromValues(0, 0, 0)
+  transformMat = mat4.create()
+
+  constructor(props: { position?: vec3; size?: number; colors?: vec4[] }) {
+    super(props)
+    this.colors = (
+      props.colors ?? times(4, () => [1.0, 1.0, 1.0, 1.0])
+    ).flatMap((c) => [c].flat() as number[])
+  }
+
+  arrowPoints = [
+    0, 0, 0, 1.5, 1.5, 1.5,
+
+    0, 0, 0, 1.5, -1.5, -1.5,
+
+    0, 0, 0, -1.5, -1.5, 1.5,
+
+    0, 0, 0, -1.5, 1.5, -1.5,
+  ]
+
+  arrowColors = times(this.arrowPoints.length / 3, () => [
+    0.7, 0.7, 0.7, 1,
+  ]).flat()
+}

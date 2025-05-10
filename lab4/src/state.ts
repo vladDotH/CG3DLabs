@@ -15,7 +15,8 @@ export const useState = defineStore('state', () => {
   })
 
   const cube = reactive(params()),
-    tetrahedron = reactive(params())
+    tetrahedron = reactive(params()),
+    carpet = reactive(params())
 
   const projection = reactive({
     perspective: false,
@@ -50,5 +51,5 @@ export const useState = defineStore('state', () => {
     }[],
   })
 
-  return { cube, tetrahedron, projection, camera, material, light }
+  return { cube, tetrahedron, carpet, projection, camera, material, light }
 })
