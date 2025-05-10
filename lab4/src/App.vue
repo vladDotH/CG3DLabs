@@ -59,8 +59,8 @@ function onMouseUp() {
   cursor.value = 'default'
 }
 
-const W = 640,
-  H = 480,
+const W = 800,
+  H = 600,
   cameraViewStep = 0.005
 
 function onMouseMove(ev: MouseEvent) {
@@ -159,9 +159,9 @@ async function init() {
   state.tetrahedron.y = -29
 
   await Promise.all([
-    cube.loadTexture(gl, 'wood1024.jpg'),
-    tetrahedron.loadTexture(gl, 'wood256.jpg'),
-    carpet.loadTexture(gl, 'carpet1024.jpg'),
+    cube.loadTexture(gl, 'wood2048-dark.jpg'),
+    tetrahedron.loadTexture(gl, 'wood256-light.jpg'),
+    carpet.loadTexture(gl, 'carpet4096.jpg'),
   ])
 
   onReset()
@@ -393,7 +393,7 @@ function render() {
 }
 
 canvas {
-  width: 640px;
-  height: 480px;
+  width: v-bind('W') px;
+  height: v-bind('H') px;
 }
 </style>
